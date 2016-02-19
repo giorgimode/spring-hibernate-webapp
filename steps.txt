@@ -1,0 +1,48 @@
+add spring dependencies
+add DispatcherServlet from New->Servlet (web.xml updated automatically)
+create offer-servlet.xml in Web-INF. Name must be same as servlet display name in web.xml (offer)
+Check Deployment Assembly. Maven dependencies should be included
+Create a controller class (@Controller annotation, @RequestMapping on method)
+in offer-servlet.xml: mvc and context namespaces. Add component-scan to bean in context tab 
+(in base-package field, add controller package). In mvc tab, add annotation-driven.
+Controller class, @RequestMapping method returns string "home". We need View Resolver.
+In offer-servlet.xml define new bean: org.springframework.web.servlet.view.InternalResourceViewResolver.
+To this bean, add properties: prefix("/WEB-INF/jsps/"), suffix(".jsp").
+In Controller class, on @RequestMapping method receive various parameters (Model, HttpSession etc.) and use in jsp.
+
+JNDI datasource (tomcat 7): 
+Copy and modify <Resource> part from tomcat doc to context.xml in servers in Tomcat in Eclipse
+Copy <resource-ref> part to web.xml
+Copy sql library tag to jsp libraries to use <sql:...>
+Copy <sql:query...> part to jsp.
+If driver missing problem, add mysql-connector to dependencies
+
+Create DAO package, add classes: Offer, OffersDAO
+Add new bean config file to new package: dao-context.xml.
+Add context namespace. Add annotation-config in context tab. 
+Add component-scan and in base-package field add package name for OffersDAO.
+
+In web.xml add listener->listenerclass:ContextLoaderListener
+Add context-param->param-name/param-value:contextConfiguration/classpath:com/giorgi/config/dao-context.xml
+
+add jndi-resource to dao-context.xml
+
+add service layer
+create service package, OffersService class.
+Inject OffersDAO field. Create method to get offers list from offersDAO.
+Add new config: service-config.xml
+Add annotation-config, component-scan(add service package in field) to context tab
+Update web.xml with new config file on classpath.
+
+Inject OffersService in OffersController and use its method to get data from DB.
+Add data to model parameter and access it in jsp.
+
+Add MVC resources to to offers-servlet.xml (via mvc tab)
+
+Add bean validator to Controller, add hibernate dependencies to pom
+------------------------------------
+Security: add dependencies
+Add security-context.xml.
+Setup rules, access patterns, users.
+Allow static content access in security rules to see css formatting.
+Custom page for login, create controller
