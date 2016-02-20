@@ -1,16 +1,14 @@
 package com.giorgi.spring.web.controllers;
 
+import java.security.Principal;
 import java.util.List;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -64,13 +62,14 @@ public class OffersController {
 
 	@RequestMapping(value = "/docreate", method = RequestMethod.POST)
 	public String decreate(Model model, @Valid Offer offer,
-			BindingResult result) {
+			BindingResult result, Principal principal) {
 
 		if (result.hasErrors()) {
 
 			return "createoffer";
 		}
-
+		
+		offer.getUser().setUsername(principal.getName());;
 		offersService.createOffer(offer);
 		
 		return "offercreated";
