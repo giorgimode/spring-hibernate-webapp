@@ -4,7 +4,7 @@
 <%@ taglib prefix="sec"
 	uri="http://www.springframework.org/security/tags"%>
 
-<table class="offers">
+<table class="formtable">
 	<tr>
 		<td>Name</td>
 		<td>Email</td>
