@@ -29,8 +29,9 @@ public class OfferDaoTests {
 
 	@Autowired
 	private OffersDao offersDao;
+
 	@Autowired
-	UsersDao usersDao;
+	private UsersDao usersDao;
 
 	@Autowired
 	private DataSource dataSource;
@@ -44,22 +45,22 @@ public class OfferDaoTests {
 	}
 
 	@Test
-	public void testCreateUser() {
+	public void testOffers() {
 
-		User user = new User("johnwpurcell", "John Purcell", "hellothere",
-				"john@caveofprogramming.com", true, "ROLE_USER");
+		User user = new User("giorgimode", "Giorgi Modebadze", "password",
+				"giorgi@gmail.com", true, "user");
 
 		assertTrue("User creation should return true", usersDao.create(user));
 
 		Offer offer = new Offer(user, "This is a test offer.");
 
-			assertTrue("Offer creation should return true", offersDao.create(offer));
+		assertTrue("Offer creation should return true", offersDao.create(offer));
 
 		List<Offer> offers = offersDao.getOffers();
 
 		assertEquals("Should be one offer in database.", 1, offers.size());
 
-			assertEquals("Retrieved offer should match created offer.", offer,
+		assertEquals("Retrieved offer should match created offer.", offer,
 				offers.get(0));
 
 		// Get the offer with ID filled in.
@@ -73,11 +74,28 @@ public class OfferDaoTests {
 		assertEquals("Updated offer should match retrieved updated offer",
 				offer, updated);
 
+		// Test get by ID ///////
+		Offer offer2 = new Offer(user, "This is a test offer.");
+
+		assertTrue("Offer creation should return true", offersDao.create(offer2));
+		
+		List<Offer> userOffers = offersDao.getOffers(user.getUsername());
+		assertEquals("Should be two offers for user.", 2, userOffers.size());
+		
+		List<Offer> secondList = offersDao.getOffers();
+		
+		for(Offer current: secondList) {
+			Offer retrieved = offersDao.getOffer(current.getId());
+			
+			assertEquals("Offer by ID should match offer from list.", current, retrieved);
+		}
+		
+		// Test deletion
 		offersDao.delete(offer.getId());
 
-		List<Offer> empty = offersDao.getOffers();
+		List<Offer> finalList = offersDao.getOffers();
 
-		assertEquals("Offers lists should be empty.", 0, empty.size());
+		assertEquals("Offers lists should contain one offer.", 1, finalList.size());
 	}
 
 }

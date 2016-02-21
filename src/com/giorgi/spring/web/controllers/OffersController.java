@@ -61,7 +61,7 @@ public class OffersController {
 	}
 
 	@RequestMapping(value = "/docreate", method = RequestMethod.POST)
-	public String decreate(Model model, @Valid Offer offer,
+	public String docreate(Model model, @Valid Offer offer,
 			BindingResult result, Principal principal) {
 
 		if (result.hasErrors()) {
@@ -75,10 +75,4 @@ public class OffersController {
 		return "offercreated";
 	}
 	
-	@RequestMapping(value = "/test", method = RequestMethod.GET)
-	public String test(Model model, @RequestParam("id") String id) {
-
-		System.out.println("ID: " + id);
-		return "home";
-	}
 }

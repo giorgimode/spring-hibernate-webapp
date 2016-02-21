@@ -1,13 +1,10 @@
 package com.giorgi.spring.web.dao;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -16,7 +13,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component("offersDAO")
+@Component("offersDao")
 public class OffersDao {
 
 	private NamedParameterJdbcTemplate jdbc;
@@ -28,43 +25,17 @@ public class OffersDao {
 
 	public List<Offer> getOffers() {
 
-		return jdbc.query("select * from offers, users where offers.username=users.username and users.enabled=true",
-				new RowMapper<Offer>() {
-
-					@Override
-					public Offer mapRow(ResultSet rs, int rowNum) throws SQLException {
-						User user = new User();
-						user.setAuthority(rs.getString("authority"));
-						user.setEmail(rs.getString("email"));
-						user.setEnabled(true);
-						user.setName(rs.getString("name"));
-						user.setUsername(rs.getString("username"));
-
-						Offer offer = new Offer();
-						offer.setId(rs.getInt("id"));
-						offer.setText(rs.getString("text"));
-						offer.setUser(user);
-
-						return offer;
-					}
-				});
+		return jdbc
+				.query("select * from offers, users where offers.username=users.username and users.enabled=true",
+						new OfferRowMapper());
 	}
 
-	/*
-	 * public List<Offer> getOffers() { MapSqlParameterSource params = new
-	 * MapSqlParameterSource(); params.addValue("name", "Sue");
-	 * 
-	 * return jdbc.query("select * from offers where name=:name", params, new
-	 * RowMapper<Offer>() {
-	 * 
-	 * public Offer mapRow(ResultSet rs, int rowNum) throws SQLException { Offer
-	 * offer = new Offer(); offer.setId(rs.getInt("id"));
-	 * offer.setName(rs.getString("name"));
-	 * offer.setEmail(rs.getString("email"));
-	 * offer.setText(rs.getString("text"));
-	 * 
-	 * return offer; } }); }
-	 */
+	public List<Offer> getOffers(String username) {
+
+		return jdbc
+				.query("select * from offers, users where offers.username=users.username and users.enabled=true and offers.username=:username",
+						new MapSqlParameterSource("username", username), new OfferRowMapper());
+	}
 
 	public boolean update(Offer offer) {
 		BeanPropertySqlParameterSource params = new BeanPropertySqlParameterSource(
@@ -106,28 +77,10 @@ public class OffersDao {
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("id", id);
 
-		return jdbc.queryForObject("select * from offers, users where offers.username=users.username and users.enabled=true", params,
-				new RowMapper<Offer>() {
-
-					@Override
-					public Offer mapRow(ResultSet rs, int rowNum)
-							throws SQLException {
-						User user = new User();
-						user.setAuthority(rs.getString("authority"));
-						user.setEmail(rs.getString("email"));
-						user.setEnabled(true);
-						user.setName(rs.getString("name"));
-						user.setUsername(rs.getString("username"));
-
-						Offer offer = new Offer();
-						offer.setId(rs.getInt("id"));
-						offer.setText(rs.getString("text"));
-						offer.setUser(user);
-
-						return offer;
-					}
-
-				});
+		return jdbc.queryForObject(
+				"select * from offers, users where offers.username=users.username and users.enabled=true and id=:id",
+				params,
+				new OfferRowMapper());
 	}
 
 }
