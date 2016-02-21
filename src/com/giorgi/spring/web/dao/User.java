@@ -1,5 +1,9 @@
 package com.giorgi.spring.web.dao;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -7,25 +11,29 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import com.giorgi.spring.web.validation.ValidEmail;
 
+@Entity
+@Table(name="users")
 public class User {
 	
-	@NotBlank
-	@Size(min=4, max=15)
-	@Pattern(regexp="^\\w{8,}$")
+	@NotBlank(groups={PersistenceValidationGroup.class, FormValidationGroup.class})
+	@Size(min=4, max=15, groups={PersistenceValidationGroup.class, FormValidationGroup.class})
+	@Pattern(regexp="^\\w{8,}$", groups={PersistenceValidationGroup.class, FormValidationGroup.class})
+	@Id
+	@Column(name="username")
 	private String username;
 	
-	@NotBlank
-	@Pattern(regexp="^\\S+$")
-	@Size(min=8, max=15)
+	@NotBlank(groups={PersistenceValidationGroup.class, FormValidationGroup.class})
+	@Pattern(regexp="^\\S+$", groups={PersistenceValidationGroup.class, FormValidationGroup.class})
+	@Size(min=8, max=15, groups={FormValidationGroup.class})
 	private String password;
 	
-	@ValidEmail
+	@ValidEmail(groups={PersistenceValidationGroup.class, FormValidationGroup.class})
 	private String email;
 	
 	private boolean enabled = false;
 	private String authority;
-	@NotBlank
-	@Size(min=4, max=60)
+	@NotBlank(groups={PersistenceValidationGroup.class, FormValidationGroup.class})
+	@Size(min=4, max=60, groups={PersistenceValidationGroup.class, FormValidationGroup.class})
 	private String name;
 	
 	public String getName() {

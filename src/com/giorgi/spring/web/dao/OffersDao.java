@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -11,12 +13,22 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+@Repository
+@Transactional
 @Component("offersDao")
 public class OffersDao {
 
 	private NamedParameterJdbcTemplate jdbc;
+	
+	@Autowired
+	private SessionFactory sessionFactory;
+	
+	public Session session() {
+		return sessionFactory.getCurrentSession();
+	}
 
 	@Autowired
 	public void setDataSource(DataSource jdbc) {
@@ -29,7 +41,7 @@ public class OffersDao {
 				.query("select * from offers, users where offers.username=users.username and users.enabled=true",
 						new OfferRowMapper());
 	}
-
+	
 	public List<Offer> getOffers(String username) {
 
 		return jdbc
@@ -44,14 +56,8 @@ public class OffersDao {
 		return jdbc.update("update offers set text=:text where id=:id", params) == 1;
 	}
 
-	public boolean create(Offer offer) {
-
-		BeanPropertySqlParameterSource params = new BeanPropertySqlParameterSource(
-				offer);
-
-		return jdbc
-				.update("insert into offers (username, text) values (:username, :text)",
-						params) == 1;
+	public void create(Offer offer) {
+		session().save(offer);
 	}
 
 	@Transactional
@@ -77,9 +83,7 @@ public class OffersDao {
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("id", id);
 
-		return jdbc.queryForObject(
-				"select * from offers, users where offers.username=users.username and users.enabled=true and id=:id",
-				params,
+		return jdbc.queryForObject("select * from offers, users where offers.username=users.username and users.enabled=true and id=:id", params,
 				new OfferRowMapper());
 	}
 

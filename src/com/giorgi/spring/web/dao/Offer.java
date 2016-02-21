@@ -1,14 +1,31 @@
 package com.giorgi.spring.web.dao;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+@Entity
+@Table(name="offers")
 public class Offer {
+
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private int id;
-
-	@Size(min = 5, max = 255)
+	
+	@Size(min=5, max=255, groups={PersistenceValidationGroup.class, FormValidationGroup.class})
+	@Column(name="text")
 	private String text;
+	
+	@ManyToOne
+	@JoinColumn(name="username")
 	private User user;
-
+	
 	public Offer() {
 		this.user = new User();
 	}
@@ -22,11 +39,6 @@ public class Offer {
 		this.id = id;
 		this.user = user;
 		this.text = text;
-	}
-
-	public String getUsername() {
-
-		return user.getUsername();
 	}
 
 	public int getId() {
@@ -45,9 +57,16 @@ public class Offer {
 		this.text = text;
 	}
 
-	@Override
-	public String toString() {
-		return "Offer [id=" + id + ", text=" + text + ", user=" + user + "]";
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
+	public String getUsername() {
+		return user.getUsername();
 	}
 
 	@Override
@@ -81,12 +100,13 @@ public class Offer {
 		return true;
 	}
 
-	public User getUser() {
-		return user;
+	@Override
+	public String toString() {
+		return "Offer [id=" + id + ", text=" + text + ", user=" + user + "]";
 	}
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+
+	
+	
 
 }
